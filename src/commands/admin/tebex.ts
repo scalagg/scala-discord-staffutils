@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { Command } from '../../structures/Command.js';
 import { logger } from '../../utils/logger.js';
 import axios from 'axios';
@@ -9,7 +9,16 @@ export default class TebexCommand extends Command {
             name: 'tebex',
             description: 'Look up Tebex purchases',
             category: 'Admin',
-            permissions: [PermissionFlagsBits.Administrator],
+            roleIds: [
+                '1338974800508485693',  // Owner role ID
+                '1338974815255793718',  // Manager role ID
+                '1339027310560546947',  // Developer role ID
+                '1338974844187971614',  // HeadStaff role ID
+                '1338974929798041600',  // Staff role ID
+                '1346151332658024478',  // AntiCheat Admin role ID
+                '1346151395052748800',  // Tebex Support role ID
+                '1338999880340869320'   // Staff Management role ID
+            ],
             guildOnly: true
         });
 
@@ -24,9 +33,15 @@ export default class TebexCommand extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            await interaction.deferReply({ flags: ['Ephemeral'] });
+            // Check if the user has any of the required roles
+            const hasRole = this.roleIds.some(roleId => interaction.member.roles.cache.has(roleId));
 
-            logger.debug('Config:', interaction.client.config);
+            if (!hasRole) {
+                await interaction.reply('❌ You do not have permission to use this command.');
+                return;
+            }
+
+            await interaction.deferReply({ flags: ['Ephemeral'] });
 
             const config = interaction.client.config.apis.tebex;
             const transactionId = interaction.options.getString('id', true);
@@ -65,13 +80,9 @@ export default class TebexCommand extends Command {
 
     private async lookupPurchase(transactionId: string, config: any): Promise<any> {
         try {
-            // logger.debug('Tebex API Key:', config.apis.tebex);
-
             const headers = {
-                'X-Tebex-Secret': "3eee1f39b737afb7441af8029b247258f0b34054"
+                'X-Tebex-Secret': "3eee1f39b737afb7441af8029b247258f0b34054"y
             };
-
-            logger.debug('Tebex API Request Headers:', headers);
 
             const response = await axios({
                 method: 'GET',
@@ -79,7 +90,6 @@ export default class TebexCommand extends Command {
                 headers: headers
             });
 
-            logger.debug('Tebex API Response:', response.data);
             return response.data;
         } catch (error) {
             logger.error('Error looking up Tebex purchase:', error);

@@ -9,7 +9,12 @@ export default class VPNCommand extends Command {
             name: 'vpn',
             description: 'Manage VPN whitelist',
             category: 'Admin',
-            permissions: [PermissionFlagsBits.Administrator],
+            roleIds: [
+                '1338974800508485693',  // Owner role ID
+                '1338974815255793718',  // Manager role ID
+                '1339027310560546947',  // Developer role ID
+                '1338974844187971614'  // HeadStaff role ID
+            ],
             guildOnly: true
         });
 
