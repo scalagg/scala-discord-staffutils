@@ -2,9 +2,8 @@ import { ChatInputCommandInteraction, PermissionFlagsBits, AttachmentBuilder } f
 import { Command } from '../../structures/Command.js';
 import { logger } from '../../utils/logger.js';
 import { HTTPUtil } from '../../utils/HTTPUtil.js';
-import AnticheatLog from '../../models/AnticheatLog.js';
+import AnticheatLog from '../../models/AnticheatLog.ts';
 
-// Add this type at the top of the file
 type LogQuery = {
     playerName: string;
     date?: { $gte: Date };
@@ -66,7 +65,6 @@ export default class AnticheatLogsCommand extends Command {
                 return;
             }
 
-            // Process logs
             const checkCounts = new Map<string, number>();
             let logBuilder = [
                 `\nPaste generated for: ${username}`,
@@ -77,7 +75,6 @@ export default class AnticheatLogsCommand extends Command {
                 ''
             ].join('\n');
 
-            // Process each log
             for (const log of lumosLogs) {
                 const checkKey = `${log.checkName} ${log.checkType}`;
                 const value = log.experimental ? 0.5 : 1.0;
@@ -95,13 +92,11 @@ export default class AnticheatLogsCommand extends Command {
                 ].join('\n');
             }
 
-            // Create file attachment
             const attachment = new AttachmentBuilder(
                 Buffer.from(logBuilder, 'utf-8'),
                 { name: `anticheat-logs-${username}.log` }
             );
 
-            // Send response with summary
             const summaryMessage = [
                 `Showing ${username}'s logs from ${type === 'total' ? 'all the time' : 'this session'} (${lumosLogs.length})`,
                 '',
