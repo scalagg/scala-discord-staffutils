@@ -1,8 +1,7 @@
-import { ChatInputCommandInteraction, PermissionFlagsBits, AttachmentBuilder } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { Command } from '../../structures/Command.js';
 import { logger } from '../../utils/logger.js';
 import { HTTPUtil } from '../../utils/HTTPUtil.js';
-import AnticheatLog from '../../models/AnticheatLog.ts';
 
 type LogQuery = {
     playerName: string;

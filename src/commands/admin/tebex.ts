@@ -12,12 +12,8 @@ export default class TebexCommand extends Command {
             roleIds: [
                 '1338974800508485693',  // Owner role ID
                 '1338974815255793718',  // Manager role ID
-                '1339027310560546947',  // Developer role ID
                 '1338974844187971614',  // HeadStaff role ID
-                '1338974929798041600',  // Staff role ID
-                '1346151332658024478',  // AntiCheat Admin role ID
-                '1346151395052748800',  // Tebex Support role ID
-                '1338999880340869320'   // Staff Management role ID
+                // Add other role IDs as needed
             ],
             guildOnly: true
         });
@@ -81,7 +77,7 @@ export default class TebexCommand extends Command {
     private async lookupPurchase(transactionId: string, config: any): Promise<any> {
         try {
             const headers = {
-                'X-Tebex-Secret': "3eee1f39b737afb7441af8029b247258f0b34054"y
+                'X-Tebex-Secret': "3eee1f39b737afb7441af8029b247258f0b34054"
             };
 
             const response = await axios({
