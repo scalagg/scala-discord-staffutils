@@ -157,13 +157,12 @@ export class HTTPUtil {
                 };
             }
 
-            // Add zero-width space after https:// to prevent Discord preview
-            const modifiedPasteUrl = pasteUrl.replace('https://', 'https://\u200B');
+            const formattedPasteUrl = `\`${pasteUrl}\``;
             
             logger.debug('Successfully created paste and retrieved logs');
             return {
                 logs: logs,
-                pasteUrl: modifiedPasteUrl
+                pasteUrl: formattedPasteUrl
             };
 
         } catch (error) {

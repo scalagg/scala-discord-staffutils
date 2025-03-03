@@ -76,7 +76,7 @@ export default class AnticheatLogsCommand extends Command {
                     `- ${check} (x${count})`
                 ),
                 '',
-                pasteUrl ? `📋 Full logs: ${pasteUrl}` : '❌ Failed to create paste link'
+                pasteUrl ? `📋 Full logs (copy & paste the link): ${pasteUrl}` : '❌ Failed to create paste link'
             ].join('\n');
 
             await interaction.editReply({
