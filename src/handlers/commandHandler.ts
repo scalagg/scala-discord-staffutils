@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, ChatInputCommandInteraction } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { Command } from '../structures/Command.js';
@@ -61,4 +61,62 @@ async function loadCommandFile(filePath: string, client: Client): Promise<Comman
         logger.error(`Error loading command from ${filePath}`, error);
     }
     return null;
+}
+
+export async function handleCommand(interaction: ChatInputCommandInteraction) {
+    try {
+        logger.debug(`Processing command: ${interaction.commandName}`);
+        
+        const command = interaction.client.commands.get(interaction.commandName);
+        
+        if (!command) {
+            logger.error(`Command not found: ${interaction.commandName}`);
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ 
+                    content: '❌ Command not found.', 
+                    ephemeral: true 
+                });
+            }
+            return;
+        }
+
+        logger.debug(`Found command: ${command.name} in category: ${command.category}`);
+        
+        // Check permissions if needed
+        if (command.permissions && command.permissions.length > 0) {
+            if (!interaction.memberPermissions?.has(command.permissions)) {
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ 
+                        content: '❌ You do not have permission to use this command.', 
+                        ephemeral: true 
+                    });
+                }
+                return;
+            }
+        }
+
+        logger.debug(`Executing command: ${command.name}`);
+        
+        // Execute the command
+        await command.execute(interaction);
+
+    } catch (error) {
+        logger.error('Error in command handler:', error);
+        
+        try {
+            // Handle the error response
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ 
+                    content: '❌ An error occurred while executing the command.', 
+                    ephemeral: true 
+                });
+            } else if (interaction.deferred) {
+                await interaction.editReply({ 
+                    content: '❌ An error occurred while executing the command.' 
+                });
+            }
+        } catch (followUpError) {
+            logger.error('Error sending error message to user:', followUpError);
+        }
+    }
 } 
