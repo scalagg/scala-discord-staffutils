@@ -48,66 +48,42 @@ export default class AnticheatLogsCommand extends Command {
                 content: `🔍 Lumos Contacting the database...`
             });
 
-            // Fetch logs from Lumos API
-            const lumosLogs = await HTTPUtil.fetchLumosLogs(username, interaction.user.id);
+            const result = await HTTPUtil.fetchLumosLogs(username, interaction.user.id);
             
-            if (!lumosLogs) {
+            if (!result || !result.logs) {
                 await interaction.editReply({
                     content: 'There was an error contacting the logs database.'
                 });
                 return;
             }
 
-            if (!Array.isArray(lumosLogs) || lumosLogs.length === 0) {
+            if (result.logs.length === 0) {
                 await interaction.editReply({
                     content: `${username} has no logs${type === 'session' ? ' this session' : ''}.`
                 });
                 return;
             }
 
+            // Count violations by check type
             const checkCounts = new Map<string, number>();
-            let logBuilder = [
-                `\nPaste generated for: ${username}`,
-                `Requested at: ${new Date().toLocaleString()}`,
-                `by ${interaction.user.tag} (${interaction.user.id})`,
-                '',
-                type === 'session' ? 'This is a Session Log so it will look differently to total logs\n' : '',
-                ''
-            ].join('\n');
-
-            for (const log of lumosLogs) {
+            for (const log of result.logs) {
                 const checkKey = `${log.checkName} ${log.checkType}`;
                 const value = log.experimental ? 0.5 : 1.0;
                 checkCounts.set(checkKey, (checkCounts.get(checkKey) || 0) + value);
-
-                const fixedData = log.checkData.replace(/\*\*\*\[EXTRA DEBUG\]\*\*\*\*(.*$)/, '');
-                
-                logBuilder += [
-                    `\nCheck: ${log.checkName} (${log.checkType})`,
-                    `Violation: ${log.violation}`,
-                    `Experimental: ${log.experimental}`,
-                    `CheckData: ${fixedData}`,
-                    `EXTRA-DEBUG: ${log.extraDebug || 'null'}`,
-                    '\n'
-                ].join('\n');
             }
 
-            const attachment = new AttachmentBuilder(
-                Buffer.from(logBuilder, 'utf-8'),
-                { name: `anticheat-logs-${username}.log` }
-            );
-
             const summaryMessage = [
-                `Showing ${username}'s logs from ${type === 'total' ? 'all the time' : 'this session'} (${lumosLogs.length})`,
+                `Showing ${username}'s logs from ${type === 'total' ? 'all time' : 'this session'} (${result.logs.length} violations)`,
                 '',
                 ...Array.from(checkCounts.entries()).map(([check, count]) => 
                     `- ${check} (x${count})`
-                )
+                ),
+                '',
+                result.pasteUrl ? `📋 Full logs: ${result.pasteUrl}` : '❌ Failed to create paste link'
             ].join('\n');
 
             await interaction.editReply({
-                content: summaryMessage,
-                files: [attachment]
+                content: summaryMessage
             });
 
         } catch (error) {

@@ -12,7 +12,7 @@ export interface BotConfig {
         };
     };
     api: {
-        weather?: string;
-        // Add other API keys here
+        tebex?: string;
+        lumosKey?: string;
     };
 } 
