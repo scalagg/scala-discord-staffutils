@@ -12,9 +12,9 @@ export default class PromoteCommand extends Command {
             description: 'Promote a user to a specified rank',
             category: 'Staff Management',
             roleIds: [
-                '1338974800508485693',
-                '1338974815255793718',
-                '1338974844187971614',
+                '1338974800508485693',  // Owner role ID
+                '1338974815255793718',  // Manager role ID
+                '1338999880340869320',  // STM role ID
             ],
             guildOnly: true
         });
@@ -38,6 +38,14 @@ export default class PromoteCommand extends Command {
                     .setDescription('The rank to promote the user to')
                     .setRequired(true)
                     .setAutocomplete(true)
+            )
+            .addStringOption(option =>
+                option
+                    .setName('role')
+                    .setDescription('The Discord role to assign to the user')
+                    .setRequired(true)
+                    .setAutocomplete(false)
+
             )
             .addBooleanOption(option =>
                 option
@@ -69,6 +77,7 @@ export default class PromoteCommand extends Command {
             const discordUser = interaction.options.getUser('discorduser', true);
             const minecraftUser = interaction.options.getString('minecraftuser', true);
             const rankName = interaction.options.getString('rank', true);
+            const roleName = interaction.options.getString('role');
             const silentPromote = interaction.options.getBoolean('silentpromote') || false;
             const subTeam = interaction.options.getString('subteam');
 
@@ -98,6 +107,17 @@ export default class PromoteCommand extends Command {
                 return;
             }
 
+            // Assign the specified role if provided
+            if (roleName) {
+                const role = interaction.guild?.roles.cache.find(r => r.name === roleName);
+                if (role) {
+                    const member = await interaction.guild?.members.fetch(discordUser.id);
+                    if (member) {
+                        await member.roles.add(role);
+                    }
+                }
+            }
+
             // Send embed message to #changelog if not silent
             if (!silentPromote) {
                 const changelogChannel = await interaction.guild?.channels.fetch('1338011148775325770');
@@ -119,6 +139,23 @@ export default class PromoteCommand extends Command {
                     logger.error('Changelog channel is not a text channel or does not exist.');
                     await interaction.editReply('❌ Failed to send promotion message to changelog channel.');
                 }
+            }
+
+            // Log the promotion in the management log channel
+            const managementLogChannel = await interaction.guild?.channels.fetch('1346181934178369626'); 
+            if (managementLogChannel && managementLogChannel instanceof TextChannel) {
+                const embed = new EmbedBuilder()
+                    .setColor('#00ff00')
+                    .setTitle('Promotion Log')
+                    .setDescription(`User <@${discordUser.id}> has been promoted to **${rank.name}**.`)
+                    .addFields(
+                        { name: 'Reason', value: `Promotion by <@${interaction.user.id}>`, inline: true }
+                    )
+                    .setTimestamp();
+
+                await managementLogChannel.send({ embeds: [embed] });
+            } else {
+                logger.error('Management log channel is not a text channel or does not exist.');
             }
 
             await interaction.editReply(`✅ Successfully promoted <@${discordUser.id}> to **${rank.name}**.\n**Make sure to update the roles in Game and in the Main Discord.**\n-# *You will not have to do this in the future as it will be automated.*`);
@@ -149,7 +186,9 @@ export default class PromoteCommand extends Command {
             name: rank.name,
             value: rank.name
         }));
+        
 
         await interaction.respond(options);
     }
+    
 } 

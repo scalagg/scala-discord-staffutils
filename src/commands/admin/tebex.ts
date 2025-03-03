@@ -13,7 +13,6 @@ export default class TebexCommand extends Command {
                 '1338974800508485693',  // Owner role ID
                 '1338974815255793718',  // Manager role ID
                 '1338974844187971614',  // HeadStaff role ID
-                // Add other role IDs as needed
             ],
             guildOnly: true
         });

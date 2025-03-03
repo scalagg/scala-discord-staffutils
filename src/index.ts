@@ -6,6 +6,8 @@ import { loadEvents } from './handlers/eventHandler';
 import { loadConfig } from './utils/configLoader';
 import { logger } from './utils/logger';
 import type { BotConfig } from './structures/Config';
+import memberEventsListener from './listeners/memberEvents.js'; // Import the member events listener
+import staffLeaveListener from './listeners/staffLeaveListener.js'; // Import the staff leave listener
 
 logger.divider();
 logger.startup('Discord Bot Starting...');
@@ -20,6 +22,7 @@ logger.success('Configuration loaded successfully');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
     ]
@@ -81,6 +84,23 @@ async function initialize() {
 
         logger.info('Logging in to Discord...');
         await client.login(config.bot.token);
+
+        // Register the listeners
+        try {
+            logger.info('Loading member events listener...');
+            memberEventsListener(client); 
+            logger.success('Member events listener loaded successfully.');
+        } catch (error) {
+            logger.error('Error loading member events listener:', error);
+        }
+
+        try {
+            logger.info('Loading staff leave listener...');
+            staffLeaveListener(client); // Register the staff leave listener
+            logger.success('Staff leave listener loaded successfully.');
+        } catch (error) {
+            logger.error('Error loading staff leave listener:', error);
+        }
     } catch (error) {
         logger.error('Initialization error', error);
         process.exit(1);
