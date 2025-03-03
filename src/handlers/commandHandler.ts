@@ -74,7 +74,8 @@ export async function handleCommand(interaction: ChatInputCommandInteraction) {
             if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply({ 
                     content: '❌ Command not found.', 
-                    ephemeral: true 
+                    ephemeral: true,
+                    flags: ['Ephemeral']
                 });
             }
             return;
@@ -88,7 +89,7 @@ export async function handleCommand(interaction: ChatInputCommandInteraction) {
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.reply({ 
                         content: '❌ You do not have permission to use this command.', 
-                        ephemeral: true 
+                        flags: ['Ephemeral']
                     });
                 }
                 return;
@@ -97,26 +98,23 @@ export async function handleCommand(interaction: ChatInputCommandInteraction) {
 
         logger.debug(`Executing command: ${command.name}`);
         
-        // Execute the command
-        await command.execute(interaction);
+        // Execute the command and catch any errors
+        await command.execute(interaction).catch(async (error) => {
+            logger.error('Error executing command:', error);
+            
+            try {
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ 
+                        content: '❌ An error occurred while executing the command.', 
+                        flags: ['Ephemeral']
+                    });
+                }
+            } catch (followUpError) {
+                logger.error('Error sending error message:', followUpError);
+            }
+        });
 
     } catch (error) {
         logger.error('Error in command handler:', error);
-        
-        try {
-            // Handle the error response
-            if (!interaction.replied && !interaction.deferred) {
-                await interaction.reply({ 
-                    content: '❌ An error occurred while executing the command.', 
-                    ephemeral: true 
-                });
-            } else if (interaction.deferred) {
-                await interaction.editReply({ 
-                    content: '❌ An error occurred while executing the command.' 
-                });
-            }
-        } catch (followUpError) {
-            logger.error('Error sending error message to user:', followUpError);
-        }
     }
 } 

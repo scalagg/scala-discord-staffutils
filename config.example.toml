@@ -1,21 +1,26 @@
-# Discord Bot Configuration
 [bot]
-# Your bot's token from Discord Developer Portal
-token = ""
-# Your bot's client ID (Application ID)
-clientId = ""
+token = "your-bot-token"
+clientId = "your-client-id"
+debug = true
 
-# Database Configuration
 [database]
-  # MongoDB connection settings
   [database.mongodb]
-  uri = "mongodb://localhost:27017/your_database"
+  uri = "mongodb://admin:BL36HLBy16PkQkb6sge02gQhojsgz8pwK417L@38.114.240.186:27054/PotPvP?authSource=admin"
 
-  # Redis connection settings
   [database.redis]
-  uri = "redis://localhost:6379"
+  uri = "redis://:59U20W3h6PwNidHcjf2F11oZjgDpHH1AvAKw5@38.114.240.186:4322"
 
-# API Keys
-[api]
-# Weather API key (optional)
-weather = "" 
+[apis]
+tebex = "your-tebex-api-key"
+# Add other API keys here 
+lumosKey = "Solara-FUCKTOPU40M64X266190JOK77Q7N1633S7"
+
+[apis.v4guard]
+key = "SCA718eb21cd491e76bf160b918e3a70e3a908d6ac1f477f6e553420c615f3e350c"
+baseUrl = "https://dashboard.v4guard.io/api/v1"
+
+[apis.anticheat]
+key = "Solara-FUCKTOPU40M64X266190JOK77Q7N1633S7"
+baseUrl = "https://backend.antiskid.club"
+panelUrl = "https://panel.antiskid.club"
+panelKey = "bc29bcf6-b837-4d39-a45a-d5ba1d4f9197" 

@@ -1,18 +1,22 @@
-export interface BotConfig {
+export interface Config {
     bot: {
         token: string;
         clientId: string;
     };
-    database: {
-        mongodb: {
-            uri: string;
+    apis: {
+        v4guard: {
+            key: string;
+            baseUrl: string;
         };
-        redis: {
-            uri: string;
+        tebex: {
+            key: string;
+            baseUrl: string;
         };
-    };
-    api: {
-        tebex?: string;
-        lumosKey?: string;
+        anticheat: {
+            key: string;
+            baseUrl: string;
+            panelUrl: string;
+            panelKey: string;
+        };
     };
 } 

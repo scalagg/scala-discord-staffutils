@@ -40,14 +40,13 @@ export default class AnticheatLogsCommand extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            if (!interaction.deferred && !interaction.replied) {
-                await interaction.deferReply({ ephemeral: true });
-            }
+            await interaction.deferReply({ flags: ['Ephemeral'] });
 
             const username = interaction.options.getString('player', true).toLowerCase();
             const type = interaction.options.getString('type') || 'total';
             
-            const result = await HTTPUtil.fetchLumosLogs(username, interaction.user.id);
+            const config = interaction.client.config.apis.anticheat;
+            const result = await HTTPUtil.fetchLumosLogs(username, interaction.user.id, config);
             
             if (!result) {
                 await interaction.editReply('❌ Failed to fetch logs for that player.');
@@ -86,13 +85,16 @@ export default class AnticheatLogsCommand extends Command {
         } catch (error) {
             logger.error('Error in anticheat logs command:', error);
             
-            if (interaction.deferred) {
-                await interaction.editReply('❌ An error occurred while fetching the logs.');
-            } else if (!interaction.replied) {
-                await interaction.reply({
-                    content: '❌ An error occurred while fetching the logs.',
-                    ephemeral: true
-                });
+            // Only try to respond if we haven't already
+            if (!interaction.replied) {
+                try {
+                    await interaction.reply({
+                        content: '❌ An error occurred while fetching the logs.',
+                        flags: ['Ephemeral']
+                    });
+                } catch (replyError) {
+                    logger.error('Error sending error response:', replyError);
+                }
             }
         }
     }
