@@ -1,0 +1,22 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "mongoose": "^8.0.0",
+    "redis": "^4.6.10",
+    "axios": "^1.6.0",
+    "@iarna/toml": "^2.2.5",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.0.0",
+    "@types/iarna__toml": "^2.0.1"
+  }
+}

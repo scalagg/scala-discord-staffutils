@@ -1,0 +1,21 @@
+# Discord Bot Configuration
+[bot]
+# Your bot's token from Discord Developer Portal
+token = ""
+# Your bot's client ID (Application ID)
+clientId = ""
+
+# Database Configuration
+[database]
+  # MongoDB connection settings
+  [database.mongodb]
+  uri = "mongodb://localhost:27017/your_database"
+
+  # Redis connection settings
+  [database.redis]
+  uri = "redis://localhost:6379"
+
+# API Keys
+[api]
+# Weather API key (optional)
+weather = "" 
