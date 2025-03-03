@@ -8,6 +8,14 @@ export default {
         // Add debug logging
         logger.debug(`Received interaction: ${interaction.type} - ${interaction.id}`);
         
+        if (interaction.isAutocomplete()) {
+            const command = interaction.client.commands.get(interaction.commandName) as Command;
+            if (command && command.autocomplete) {
+                await command.autocomplete(interaction);
+            }
+            return;
+        }
+
         if (!interaction.isChatInputCommand()) {
             logger.debug('Not a chat input command, ignoring');
             return;
