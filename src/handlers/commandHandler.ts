@@ -83,9 +83,10 @@ export async function handleCommand(interaction: ChatInputCommandInteraction) {
 
         logger.debug(`Found command: ${command.name} in category: ${command.category}`);
         
-        // Check permissions if needed
-        if (command.permissions && command.permissions.length > 0) {
-            if (!interaction.memberPermissions?.has(command.permissions)) {
+        // Check role IDs if needed
+        if (command.roleIds && command.roleIds.length > 0) {
+            const hasRole = command.roleIds.some(roleId => interaction.member.roles.cache.has(roleId));
+            if (!hasRole) {
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.reply({ 
                         content: '❌ You do not have permission to use this command.', 

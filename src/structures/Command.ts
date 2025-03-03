@@ -1,14 +1,13 @@
 import { 
     SlashCommandBuilder, 
     ChatInputCommandInteraction,
-    type PermissionResolvable,
     type AutocompleteInteraction
 } from 'discord.js';
 
 export interface CommandOptions {
     name: string;
     description: string;
-    permissions?: PermissionResolvable[];
+    roleIds?: string[];
     cooldown?: number;
     category?: string;
     guildOnly?: boolean;
@@ -17,7 +16,7 @@ export interface CommandOptions {
 export abstract class Command {
     public name: string;
     public description: string;
-    public permissions: PermissionResolvable[];
+    public roleIds: string[];
     public cooldown: number;
     public category: string;
     public guildOnly: boolean;
@@ -26,7 +25,7 @@ export abstract class Command {
     constructor(options: CommandOptions) {
         this.name = options.name;
         this.description = options.description;
-        this.permissions = options.permissions || [];
+        this.roleIds = options.roleIds || [];
         this.cooldown = options.cooldown || 0;
         this.category = options.category || 'Miscellaneous';
         this.guildOnly = options.guildOnly || false;

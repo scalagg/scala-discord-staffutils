@@ -39,11 +39,11 @@ export default {
                 return;
             }
 
-            // Check permissions
-            if (command.permissions.length > 0) {
-                const member = interaction.guild?.members.cache.get(interaction.user.id);
-                if (!member?.permissions.has(command.permissions)) {
-                    logger.debug(`User lacks permissions: ${command.permissions.join(', ')}`);
+            // Check role IDs if needed
+            if (command.roleIds && command.roleIds.length > 0) {
+                const hasRole = command.roleIds.some(roleId => interaction.member.roles.cache.has(roleId));
+                if (!hasRole) {
+                    logger.debug(`User lacks roles: ${command.roleIds.join(', ')}`);
                     await interaction.reply({ 
                         content: 'You do not have permission to use this command!', 
                         ephemeral: true 
