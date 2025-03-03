@@ -1,29 +1,32 @@
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 import { logger } from './logger.js';
 import { config } from '../config.js'; // Import your config
 
-const client = new MongoClient(config.database.mongodb.uri); // Use the URI from the config
+const mongoURI = config.database.mongodb.uri; 
 
-export async function connect() {
+export const connectToMongo = async () => {
     try {
-        await client.connect(); // Connect to the MongoDB server
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         logger.info('Connected to MongoDB');
     } catch (error) {
-        logger.error('Error connecting to MongoDB:', error);
+        logger.error('MongoDB connection error:', error);
         throw error; // Rethrow the error for handling in the calling function
     }
-}
+};
 
 export async function disconnect() {
     try {
-        await client.close();
+        await mongoose.connection.close();
         logger.info('Disconnected from MongoDB');
     } catch (error) {
         logger.error('Error disconnecting from MongoDB:', error);
     }
 }
 
-export async function getCollection(collectionName: string) {
-    await connect(); // Ensure the client is connected
-    return client.db('PotPvP').collection(collectionName);
-} 
+export const getCollection = async (collectionName: string) => {
+    await connectToMongo(); // Ensure the connection is established
+    return mongoose.connection.collection(collectionName);
+}; 
